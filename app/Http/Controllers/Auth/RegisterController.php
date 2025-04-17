@@ -50,7 +50,7 @@ class RegisterController extends Controller
     {
         $rules = [
             'name' => ['required', 'regex:/^[a-zA-Zก-๏]+(\s[a-zA-Zก-๏]+)?$/u', 'max:100'],
-            'student_id' => ['required', 'numeric', 'digits:10', 'unique:users'],
+            // 'student_id' => ['required', 'numeric', 'digits:10', 'unique:users'],
             'branch' => ['required',],
             'year' => ['required',],
             'phone_number' => ['required', 'numeric', 'digits:10'],
@@ -63,10 +63,10 @@ class RegisterController extends Controller
             'name.max' => 'ชื่อ-นามสกุลยาวเกินไป (สูงสุด 100 ตัวอักษร)',
             'name.regex' => 'กรุณากรอกชื่อให้ถูกต้อง และสามารถเว้นวรรคได้แค่ 1 ครั้ง',
 
-            'student_id.required' => 'กรุณากรอกรหัสนักศึกษา',
-            'student_id.numeric' => 'รหัสนักศึกษาต้องเป็นเป็นตัวเลขเท่านั้น',
-            'student_id.digits' => 'กรุณากรอกรหัสนักศึกษาให้ครบ 10 ตัวอักษร',
-            'student_id.unique' => 'รหัสนักศึกษาได้ถูกลงทะเบียนไปแล้ว',
+            // 'student_id.required' => 'กรุณากรอกรหัสนักศึกษา',
+            // 'student_id.numeric' => 'รหัสนักศึกษาต้องเป็นเป็นตัวเลขเท่านั้น',
+            // 'student_id.digits' => 'กรุณากรอกรหัสนักศึกษาให้ครบ 10 ตัวอักษร',
+            // 'student_id.unique' => 'รหัสนักศึกษาได้ถูกลงทะเบียนไปแล้ว',
 
             'branch.required' => 'กรุณาเลือกสาขา',
             'branch.exists' => 'ข้อมูลสาขาไม่ถูกต้อง',

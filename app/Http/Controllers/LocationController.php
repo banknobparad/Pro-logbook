@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
-
-
     public function add()
     {
         return view('location.add');

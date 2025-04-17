@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['Administrator', 'Teacher', 'Student', 'Mentor'])->default('Student');
-            $table->tinyInteger('req')->default(0);
+
             $table->rememberToken();
             $table->timestamps();
         });

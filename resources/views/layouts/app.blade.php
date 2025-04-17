@@ -50,7 +50,7 @@
 
 </head>
 
-<body {{-- data-bs-theme="dark" --}}>
+<body data-bs-theme="dark">
     <div id="app">
         <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
             <div class="container">
@@ -159,22 +159,20 @@
                             <!-- สำหรับ Student -->
                             @if (Auth::user()->role == 'Student')
                                 <li class="nav-item">
-                                    <a class="nav-link  @yield('activeStudent')"
-                                        href=" ">{{ __('ประวัติการเช็คชื่อ') }}</a>
+                                    <a class="nav-link  @yield('activeStudent')" href=" ">{{ __('นักเรียน') }}</a>
                                 </li>
                             @endif
 
                             <!-- สำหรับ Mentor -->
                             @if (Auth::user()->role == 'Mentor')
                                 <li class="nav-item">
-                                    <a class="nav-link  @yield('activeStudent')"
-                                        href=" ">{{ __('ประวัติการเช็คชื่อ') }}</a>
+                                    <a class="nav-link  @yield('activeStudent')" href=" ">{{ __('พี่เลี้ยง') }}</a>
                                 </li>
                             @endif
 
                             <!-- เมนู "เปลี่ยนบทบาท" สำหรับทุก role -->
                             <li class="nav-item">
-                                <a class="nav-link" href="#">{{ __('ลงทะเบียนพี่เลี้ยง') }}</a>
+                                <a class="nav-link" href="{{ route('req') }}">{{ __('ลงทะเบียนพี่เลี้ยง') }}</a>
                             </li>
 
                             <!-- เมนู Logout -->

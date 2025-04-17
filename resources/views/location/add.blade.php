@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('title')
     Subject
 @endsection
@@ -62,4 +63,20 @@
             </div>
         </form>
     </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (session('success'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    title: "สำเร็จ!",
+                    text: "{{ session('success') }}",
+                    icon: "success",
+                    confirmButtonText: "ตกลง"
+                });
+            });
+        </script>
+    @endif
 @endsection
