@@ -57,6 +57,24 @@
             </div>
         @endif
     </div>
+    <div class="mt-4">
+                            <h6 class="text-muted">เพื่อนที่ฝึกงานด้วยกัน</h6>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="card shadow-sm" style="width: 10rem;">
+                                    <div class="card-body text-center p-2">
+                                        <p class="card-text mb-0">เพื่อน A</p>
+                                        <small class="text-muted">IT ปี 3</small>
+                                    </div>
+                                </div>
+                                <div class="card shadow-sm" style="width: 10rem;">
+                                    <div class="card-body text-center p-2">
+                                        <p class="card-text mb-0">เพื่อน B</p>
+                                        <small class="text-muted">IT ปี 3</small>
+                                    </div>
+                                </div>
+                                <!-- เพิ่มเพื่อนเพิ่มได้ที่นี่ -->
+                            </div>
+                        </div>
 @endsection --}}
 
 @extends('layouts.app')
@@ -94,12 +112,13 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>ชื่อ-นามสกุล:</strong> นาย นพรัตน์ ธนสารศิริกุล</p>
+                            <p><strong>ชั้นปี:</strong> 1</p>
                         </div>
                         <div class="col-md-6">
-
+                            <p><strong>สาขาวิชา:</strong> วิทคอม</p>
                         </div>
                     </div>
+                    <hr>
                     <div class="col-md-9">
                         <h5 class="mb-3">ข้อมูลส่วนตัว</h5>
                         <div class="row">
@@ -108,24 +127,7 @@
                             <p><strong>ที่อยู่:</strong> 123/4 หมู่ 5 ต.ทดสอบ อ.เมือง จ.การฝึกงาน</p>
                         </div>
                         <!-- Friends Section -->
-                        <div class="mt-4">
-                            <h6 class="text-muted">เพื่อนที่ฝึกงานด้วยกัน</h6>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="card shadow-sm" style="width: 10rem;">
-                                    <div class="card-body text-center p-2">
-                                        <p class="card-text mb-0">เพื่อน A</p>
-                                        <small class="text-muted">IT ปี 3</small>
-                                    </div>
-                                </div>
-                                <div class="card shadow-sm" style="width: 10rem;">
-                                    <div class="card-body text-center p-2">
-                                        <p class="card-text mb-0">เพื่อน B</p>
-                                        <small class="text-muted">IT ปี 3</small>
-                                    </div>
-                                </div>
-                                <!-- เพิ่มเพื่อนเพิ่มได้ที่นี่ -->
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
