@@ -152,14 +152,15 @@
                             @if (Auth::user()->role == 'Teacher')
                                 <li class="nav-item">
                                     <a class="nav-link  @yield('activeSubject')"
-                                        href="{{ route('location.add') }}">{{ __('สถานที่') }}</a>
+                                        href="{{ route('location.index') }}">{{ __('สถานที่') }}</a>
                                 </li>
                             @endif
 
                             <!-- สำหรับ Student -->
                             @if (Auth::user()->role == 'Student')
                                 <li class="nav-item">
-                                    <a class="nav-link  @yield('activeStudent')" href=" ">{{ __('นักเรียน') }}</a>
+                                    <a class="nav-link  @yield('activeStudent')"
+                                        href=" {{ route('student.index') }}">{{ __('หน้าแรก') }}</a>
                                 </li>
                             @endif
 

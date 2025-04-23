@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MentorController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -33,10 +34,12 @@ Route::put('/confirms/update', [MentorController::class, 'update'])->name('confi
 Route::post('/approve-mentor', [AdminController::class, 'approveMentor'])->name('approve.mentor');
 
 Route::group(['prefix' => 'location'], function () {
-    Route::get('add', [LocationController::class, 'add'])->name('location.add');
+    Route::get('index', [LocationController::class, 'index'])->name('location.index');
     Route::post('addstore', [LocationController::class, 'store'])->name('location.store');
+});
 
-    // Route::post('update-role', [LocationController::class, 'edit'])->name('users.updateRole');
+Route::group(['prefix' => 'student'], function () {
+    Route::get('index', [StudentController::class, 'index'])->name('student.index');
 });
 
 

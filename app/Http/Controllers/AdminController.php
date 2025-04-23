@@ -46,6 +46,20 @@ class AdminController extends Controller
 
     //     return redirect()->back()->with('success', 'อนุมัติเรียบร้อยแล้ว');
     // }
+    public function edit(Request $request)
+    {
+        $request->validate([
+            'userId' => 'required|exists:users,id',
+            'role' => 'required|in:Administrator,Teacher,Student,Mentor',
+        ]);
+
+        $user = User::findOrFail($request->userId);
+        $user->role = $request->role;
+        $user->save();
+
+        return response()->json(['success' => true]);
+    }
+
 
     public function approveMentor(Request $request)
     {
