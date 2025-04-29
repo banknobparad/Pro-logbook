@@ -6,6 +6,7 @@ use App\Http\Controllers\MentorController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +31,6 @@ Route::get('/req', [MentorController::class, 'req'])->name('req');
 Route::post('/req', [MentorController::class, 'store'])->name('confirms.store');
 Route::put('/confirms/update', [MentorController::class, 'update'])->name('confirms.update');
 
-
 Route::post('/approve-mentor', [AdminController::class, 'approveMentor'])->name('approve.mentor');
 
 Route::group(['prefix' => 'location'], function () {
@@ -40,8 +40,18 @@ Route::group(['prefix' => 'location'], function () {
 
 Route::group(['prefix' => 'student'], function () {
     Route::get('index', [StudentController::class, 'index'])->name('student.index');
+    Route::post('/upload-image', [StudentController::class, 'uploadImage'])->name('student.uploadImage');
 });
 
+Route::post('/student/upload-image', [StudentController::class, 'uploadImage'])->name('student.uploadImage');
+
+Route::get('/create-student-images-folder', function () {
+    $path = public_path('student_images');
+    if (!File::exists($path)) {
+        File::makeDirectory($path, 0755, true);
+    }
+    return 'Folder created successfully!';
+});
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::group(['prefix' => 'edit'], function () {
