@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MentorController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentLogController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
@@ -58,4 +59,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
         Route::get('users', [AdminController::class, 'users'])->name('user.index');
         Route::post('update-role', [AdminController::class, 'edit'])->name('users.updateRole');
     });
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/student/log', [StudentLogController::class, 'index'])->name('student.log');
+    Route::post('/student/log', [StudentLogController::class, 'store'])->name('student.log.store');
 });
