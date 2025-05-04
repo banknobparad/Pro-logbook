@@ -1,13 +1,16 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\StudentLog; 
 use Illuminate\Http\Request;
 
 class StudentLogController extends Controller
 {
     public function index()
     {
-        return view('student.log');
+        $student_log = StudentLog::where('student_id', auth()->user()->student_id)->get();
+        
+        return view('student.log', compact('student_log'));
     }
 
     public function store(Request $request)

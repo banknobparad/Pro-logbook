@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use App\Models\StudentInfo;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,10 +13,11 @@ class StudentController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $student_infos = StudentInfo::all(); // Fetch all records from student_infos table
+        $user = auth()->user();
+        $student_infos = StudentInfo::all();
+        $locations = Location::all();
 
-        return view('student.index', compact('user', 'student_infos'));
+        return view('student.index', compact('user', 'student_infos', 'locations'));
     }
 
     public function uploadImage(Request $request)
