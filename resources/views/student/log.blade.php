@@ -3,6 +3,15 @@
 @section('content')
 <div class="container">
     <h1 class="text-center mb-4">รายการบันทึกประจำวัน</h1>
+
+    <!-- Success Alert -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <form action="{{ route('student.log.store') }}" method="POST" id="logForm">
         @csrf
         <div class="row mb-4">
@@ -40,9 +49,12 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-between mb-3">
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addLogModal">เพิ่มบันทึก</button>
-        </div>
+        @if(auth()->user()->role === 'Student')
+            <div class="d-flex justify-content-between mb-3">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addLogModal">เพิ่มบันทึก</button>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editLogModal">แก้ไขบันทึก</button>
+            </div>
+        @endif
 
         <!-- Add Log Modal -->
         <div class="modal fade" id="addLogModal" tabindex="-1" aria-labelledby="addLogModalLabel" aria-hidden="true">
@@ -77,6 +89,51 @@
             </div>
         </div>
 
+        <!-- Edit Log Modal -->
+        <div class="modal fade" id="editLogModal" tabindex="-1" aria-labelledby="editLogModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('student.log.update') }}" method="POST" id="editLogForm">
+                        @csrf
+                        @method('PUT') 
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editLogModalLabel">แก้ไขบันทึก</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="editLogDate" class="form-label">เลือกวันที่</label>
+                                <select class="form-select" id="editLogDate" name="date" required>
+                                    @php
+                                        $logs = collect($student_log->where('student_id', auth()->user()->student_id)->first()->log ?? [])->sortBy('log_date');
+                                    @endphp
+                                    @foreach($logs as $log)
+                                        <option value="{{ $log['log_date'] }}">{{ \Carbon\Carbon::parse($log['log_date'])->format('d/m/Y') }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editLogTitle" class="form-label">หัวข้อ</label>
+                                <input type="text" class="form-control" id="editLogTitle" name="title" placeholder="หัวข้อบันทึก">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editLogDetails" class="form-label">รายละเอียด</label>
+                                <textarea class="form-control" id="editLogDetails" name="details" rows="3" placeholder="รายละเอียดบันทึก"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                            <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @php
+            $logs = collect($student_log->where('student_id', auth()->user()->student_id)->first()->log ?? [])->sortBy('log_date');
+        @endphp
+
         <table class="table table-bordered table-striped table-hover text-center align-middle" id="logEntries">
             <thead class="table-primary">
                 <tr>
@@ -92,22 +149,45 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse(collect($student_log) as $log)
+                @forelse($logs as $log)
                 <tr>
-                    <td>{{ $log->log_day }}</td>
-                    <td>{{ $log->log_header }}</td>
-                    <td>{{ $log->log_detail }}</td>
+                    <td>{{ \Carbon\Carbon::parse($log['log_date'])->format('d/m/Y') }}</td>
+                    <td>{{ $log['log_header'] }}</td>
+                    <td>{{ $log['log_detail'] }}</td>
                     @if(auth()->user()->role === 'Teacher' || auth()->user()->role === 'Mentor')
-                    <td>{{ $log->created_date }}</td>
+                    <td>{{ \Carbon\Carbon::parse($log['created_date'])->format('d/m/Y') }}</td>
                     @endif
                     <td>
-                        <!-- Teacher comments logic -->
+                        <button type="button" class="btn btn-outline-primary btn-sm viewTeacherComments" data-bs-toggle="modal" data-bs-target="#teacherCommentsModal">
+                            <i class="bi bi-eye"></i> 
+                            @if(auth()->user()->role === 'Teacher')
+                                เพิ่มความคิดเห็น
+                            @else
+                                ดูความคิดเห็น
+                            @endif
+                        </button>
+                        <input type="hidden" value="{{ json_encode($log['t_comments'] ?? []) }}">
                     </td>
                     <td>
-                        <!-- Mentor comments logic -->
+                        <button type="button" class="btn btn-outline-primary btn-sm viewMentorComments" data-bs-toggle="modal" data-bs-target="#mentorCommentsModal">
+                            <i class="bi bi-eye"></i> 
+                            @if(auth()->user()->role === 'Mentor')
+                                เพิ่มความคิดเห็น
+                            @else
+                                ดูความคิดเห็น
+                            @endif
+                        </button>
+                        <input type="hidden" value="{{ json_encode($log['m_comments'] ?? []) }}">
                     </td>
                     <td>
-                        <!-- Mentor signature logic -->
+                        <form action="{{ route('mentor.signature.update', $log['id'] ?? '') }}" method="POST">
+                            @csrf
+                            @if(auth()->user()->role === 'Mentor')
+                                <input type="checkbox" name="signature" value="1" onchange="this.form.submit()" {{ $log['signature'] ?? false ? 'checked' : '' }}>
+                            @else
+                                <input type="checkbox" disabled {{ $log['signature'] ?? false ? 'checked' : '' }}>
+                            @endif
+                        </form>
                     </td>
                 </tr>
                 @empty
@@ -118,57 +198,87 @@
             </tbody>
         </table>
     </form>
-</div>
-
+</div> 
+    <!-- Teacher Comments Modal -->
 <div class="modal fade" id="teacherCommentsModal" tabindex="-1" aria-labelledby="teacherCommentsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="teacherCommentsModalLabel">ความเห็นจากอาจารย์</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <textarea class="form-control" id="modalTeacherComments" rows="5" readonly></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-            </div>
+            <form action="{{ route('teacher.comment.update') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="teacherCommentsModalLabel">ความเห็นจากอาจารย์</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" id="modalTeacherComments" name="teacher_comments" rows="5" {{ auth()->user()->role === 'Teacher' ? '' : 'readonly' }}></textarea>
+                </div>
+                @if(auth()->user()->role === 'Teacher')
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="submit" class="btn btn-primary">บันทึก</button>
+                </div>
+                @endif
+            </form>
         </div>
     </div>
 </div>
-
+    <!-- Mentor Comments Modal -->
 <div class="modal fade" id="mentorCommentsModal" tabindex="-1" aria-labelledby="mentorCommentsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="mentorCommentsModalLabel">ความเห็นจากพี่เลี้ยง</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <textarea class="form-control" id="modalMentorComments" rows="5" readonly></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-            </div>
+            <form action="{{ route('mentor.comment.update') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mentorCommentsModalLabel">ความเห็นจากพี่เลี้ยง</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" id="modalMentorComments" name="mentor_comments" rows="5" {{ auth()->user()->role === 'Mentor' ? '' : 'readonly' }}></textarea>
+                </div>
+                @if(auth()->user()->role === 'Mentor')
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    <button type="submit" class="btn btn-primary">บันทึก</button>
+                </div>
+                @endif
+            </form>
         </div>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.viewTeacherComments').forEach(button => {
-            button.addEventListener('click', function () {
-                const comments = this.nextElementSibling.value;
-                document.getElementById('modalTeacherComments').value = comments;
-            });
+        const logs = @json($logs->toArray()); 
+        const editLogDate = document.getElementById('editLogDate');
+        const editLogTitle = document.getElementById('editLogTitle');
+        const editLogDetails = document.getElementById('editLogDetails');
+        const editLogForm = document.getElementById('editLogForm');
+
+        editLogDate.addEventListener('change', function () {
+            const selectedDate = this.value;
+            const log = logs.find(log => log.log_date === selectedDate);
+            if (log) {
+                editLogTitle.value = log.log_header;
+                editLogDetails.value = log.log_detail;
+            }
         });
 
-        document.querySelectorAll('.viewMentorComments').forEach(button => {
-            button.addEventListener('click', function () {
-                const comments = this.nextElementSibling.value;
-                document.getElementById('modalMentorComments').value = comments;
-            });
+        editLogForm.addEventListener('submit', function (event) {
+            const selectedDate = editLogDate.value;
+            const log = logs.find(log => log.log_date === selectedDate);
+
+            if (log) {
+                if (!editLogTitle.value.trim() || editLogTitle.value.trim() === log.log_header) {
+                    editLogTitle.value = log.log_header;
+                }
+                if (!editLogDetails.value.trim() || editLogDetails.value.trim() === log.log_detail) {
+                    editLogDetails.value = log.log_detail;
+                }
+            }
         });
+
+        // Trigger change event to populate fields for the first option
+        editLogDate.dispatchEvent(new Event('change'));
     });
 </script>
 @endsection

@@ -5,6 +5,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MentorController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentLogController;
+use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
@@ -33,6 +34,10 @@ Route::post('/req', [MentorController::class, 'store'])->name('confirms.store');
 Route::put('/confirms/update', [MentorController::class, 'update'])->name('confirms.update');
 
 Route::post('/approve-mentor', [AdminController::class, 'approveMentor'])->name('approve.mentor');
+
+Route::post('/mentor/signature/update/{id}', [MentorController::class, 'updateSignature'])->name('mentor.signature.update');
+
+Route::post('/mentor/comment/update', [MentorController::class, 'updateComment'])->name('mentor.comment.update');
 
 Route::group(['prefix' => 'location'], function () {
     Route::get('index', [LocationController::class, 'index'])->name('location.index');
@@ -64,4 +69,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/student/log', [StudentLogController::class, 'index'])->name('student.log');
     Route::post('/student/log', [StudentLogController::class, 'store'])->name('student.log.store');
+    Route::put('/student/log/update', [StudentLogController::class, 'update'])->name('student.log.update');
 });
+
+Route::post('/teacher/comment/update', [TeacherController::class, 'updateComment'])->name('teacher.comment.update');

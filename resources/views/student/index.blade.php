@@ -213,32 +213,83 @@
                 <div class="row mt-3">
                     @php
                         $locations = $locations ?? collect();
+                        $locationInfos = $location_infos ?? collect();
+
+                        // Union locations and location_infos
+                        $allLocations = $locations->map(function ($location) {
+                            return [
+                                'loc_id' => $location->loc_id,
+                                'name' => $location->name,
+                                'term_year' => $location->term_year,
+                                'loc_detail' => null,
+                                'loc_house_no' => null,
+                                'loc_moo' => null,
+                                'loc_soi' => null,
+                                'loc_road' => null,
+                                'loc_subdistrict' => null,
+                                'loc_district' => null,
+                                'loc_province' => null,
+                                'loc_zip_code' => null,
+                                'loc_phone_number' => null,
+                                'student_ids' => [
+                                    $location->student_id1,
+                                    $location->student_id2,
+                                    $location->student_id3,
+                                    $location->student_id4
+                                ]
+                            ];
+                        })->merge($locationInfos->map(function ($info) {
+                            return [
+                                'loc_id' => $info->loc_id,
+                                'name' => null,
+                                'term_year' => null,
+                                'loc_detail' => $info->loc_detail, 
+                                'loc_house_no' => $info->loc_house_no,
+                                'loc_moo' => $info->loc_moo,
+                                'loc_soi' => $info->loc_soi,
+                                'loc_road' => $info->loc_road,
+                                'loc_subdistrict' => $info->loc_subdistrict,
+                                'loc_district' => $info->loc_district,
+                                'loc_province' => $info->loc_province,
+                                'loc_zip_code' => $info->loc_zip_code,
+                                'loc_phone_number' => $info->loc_phone_number,
+                                'student_ids' => []
+                            ];
+                        }));
+
+                        $filteredLocation = $allLocations->filter(function ($location) use ($user) {
+                            return in_array($user->student_id, $location['student_ids']);
+                        })->reduce(function ($carry, $item) {
+                            return array_merge($carry, array_filter($item, fn($value) => $value !== null));
+                        }, []);
                     @endphp
                     <div class="col-md-12">
-                        <p><strong>สถานที่ฝึกงาน:</strong> {{ $locations->where('student_id', $user->student_id)->first()->name ?? '-' }}</p>
+                        <p><strong>สถานที่ฝึกงาน:</strong> {{ $filteredLocation['name'] ?? '-' }}</p>
                     </div>
                     <div class="col-md-12">
-                        <p><strong>ภาคการศึกษา:</strong> {{ $locations->where('student_id', $user->student_id)->first()->term_year ?? '-' }}</p>
+                        <p><strong>ภาคการศึกษา:</strong> {{ $filteredLocation['term_year'] ?? '-' }}</p>
                     </div>
                     <div class="col-md-12">
-                        <p><strong>ข้อมูลสถานที่ฝึกงาน:</strong> {{ $locations->where('student_id', $user->student_id)->first()->loc_detail ?? '-' }}</p>
+                        <p><strong>ข้อมูลสถานที่ฝึกงาน:</strong> {{ $filteredLocation['loc_detail'] ?? '-' }}</p>
                     </div>
                     <div class="col-md-12">
                         <p><strong>ที่อยู่:</strong>
-                            @if (isset($locations) && $user->student_id)
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_house_no ?? '-' }} หมู่
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_moo ?? '-' }} ซอย
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_soi ?? '-' }} ถนน
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_road ?? '-' }} ตำบล
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_subdistrict ?? '-' }} อำเภอ
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_district ?? '-' }} จังหวัด
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_province ?? '-' }} รหัสไปรษณีย์
-                                {{ $locations->where('student_id', $user->student_id)->first()->loc_zip_code ?? '-' }}
+                            @if ($filteredLocation)
+                                {{ $filteredLocation['loc_house_no'] ?? '-' }} หมู่
+                                {{ $filteredLocation['loc_moo'] ?? '-' }} ซอย
+                                {{ $filteredLocation['loc_soi'] ?? '-' }} ถนน
+                                {{ $filteredLocation['loc_road'] ?? '-' }} ตำบล
+                                {{ $filteredLocation['loc_subdistrict'] ?? '-' }} อำเภอ
+                                {{ $filteredLocation['loc_district'] ?? '-' }} จังหวัด
+                                {{ $filteredLocation['loc_province'] ?? '-' }} รหัสไปรษณีย์
+                                {{ $filteredLocation['loc_zip_code'] ?? '-' }}
+                            @else
+                                -
                             @endif
                         </p>
                     </div>
                     <div class="col-md-12">
-                        <p><strong>เบอร์โทร/แฟกซ์:</strong> {{ $locations->where('student_id', $user->student_id)->first()->loc_phone_number ?? '-' }}</p>
+                        <p><strong>เบอร์โทร/แฟกซ์:</strong> {{ $filteredLocation['loc_phone_number'] ?? '-' }}</p>
                     </div>
                 </div>
             </div>

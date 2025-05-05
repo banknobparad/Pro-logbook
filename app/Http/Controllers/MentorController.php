@@ -6,6 +6,7 @@ use App\Models\Confirm;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\StudentLog;
 
 class MentorController extends Controller
 {
@@ -77,5 +78,29 @@ class MentorController extends Controller
         }
 
         return redirect()->back()->with('success', 'เปลี่ยนสถานที่เรียบร้อย');
+    }
+
+    public function updateSignature(Request $request, $id)
+    {
+        $log = StudentLog::findOrFail($id);
+
+        if (auth()->user()->role === 'Mentor') {
+            $log->signature = $request->has('signature') ? 1 : 0;
+            $log->save();
+        }
+
+        return redirect()->back()->with('success', 'ลายเซ็นต์พี่เลี้ยงถูกอัปเดตเรียบร้อยแล้ว');
+    }
+
+    public function updateComment(Request $request)
+    {
+        $log = StudentLog::findOrFail($request->id);
+
+        if (auth()->user()->role === 'Mentor') {
+            $log->mentor_comments = $request->mentor_comments;
+            $log->save();
+        }
+
+        return redirect()->back()->with('success', 'ความคิดเห็นของพี่เลี้ยงถูกอัปเดตเรียบร้อยแล้ว');
     }
 }
