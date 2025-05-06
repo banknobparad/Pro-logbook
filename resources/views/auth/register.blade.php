@@ -15,10 +15,30 @@
                         <form method="POST" action="{{ route('register') }}">
                             @csrf
 
+                            <div class="row mb-3">
+                                <label for="prefix" class="col-md-2 col-form-label text-md-end">{{ __('คำนำหน้า') }}</label>
+                                <div class="col-md-10">
+                                    <select name="prefix" id="prefix"
+                                        class="form-select @error('prefix') is-invalid @enderror @if (old('prefix')) is-valid @endif">
+                                        <option value="" selected disabled>{{ __('เลือกคำนำหน้า') }}</option>
+                                        @foreach (['นาย', 'นาง', 'นางสาว', 'อาจารย์'] as $item)
+                                            <option value="{{ $item }}" {{ old('prefix') == $item ? 'selected' : '' }}>
+                                                {{ $item }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('prefix')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+
                             <div class="form-floating mb-3">
                                 <input id="name" type="text"
                                     class="form-control @error('name') is-invalid @enderror @if (old('name')) is-valid @endif"
-                                    name="name" value="{{ old('name') }}" autocomplete="name" autofocus
+                                    name="name" value="{{ old('prefix') . ' ' . old('name') }}" autocomplete="name" autofocus
                                     placeholder="ชื่อ นามสกุล">
                                 <label for="name">{{ __('ชื่อ-นามสกุล') }}</label>
                                 @error('name')

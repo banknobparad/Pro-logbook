@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/student/log', [StudentLogController::class, 'index'])->name('student.log');
     Route::post('/student/log', [StudentLogController::class, 'store'])->name('student.log.store');
     Route::put('/student/log/update', [StudentLogController::class, 'update'])->name('student.log.update');
+    Route::get('/teacher', [TeacherController::class, 'index'])->name('teacher.index');
 });
 
 Route::post('/teacher/comment/update', [TeacherController::class, 'updateComment'])->name('teacher.comment.update');

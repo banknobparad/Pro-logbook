@@ -123,7 +123,11 @@
                             @if (Auth::user()->role == 'Teacher')
                                 <li class="nav-item">
                                     <a class="nav-link  @yield('activeSubject')"
-                                        href="{{ route('location.index') }}">{{ __('สถานที่') }}</a>
+                                        href="{{ route('location.index') }}">{{ __('สถานที่ฝึกงาน') }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  @yield('activeTeacherLog')"
+                                        href="{{ route('teacher.index') }}">{{ __('ตรวจสอบบันทึกประจำวัน') }}</a>
                                 </li>
                             @endif
 
@@ -146,6 +150,10 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('req') }}">{{ __('ลงทะเบียนพี่เลี้ยง') }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  @yield('activeMentorLog')"
+                                        href="{{ route('teacher.index') }}">{{ __('ตรวจสอบบันทึกประจำวัน') }}</a>
                                 </li>
                             @endif
 
