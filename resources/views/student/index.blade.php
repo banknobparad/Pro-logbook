@@ -1,82 +1,3 @@
-{{-- @extends('layouts.app')
-
-@section('title')
-    Subject
-@endsection
-
-@section('activeUsers')
-    active border-2 border-bottom border-primary
-@endsection
-
-@section('content')
-    <div class="container mt-4">
-        @if ($location)
-            <h2 class="display-4 mb-4">ชื่อที่ฝึกงาน {{ $location->name ?? '-' }}</h2>
-            <hr>
-            <div class="card mb-4 shadow-sm border-2 p-4">
-
-                <!-- แถวแรก: ข้อมูลของคุณ (ขวาว่าง) -->
-                <div class="row">
-                    <div class="col-md-4 "></div>
-                    <div class="col-md-3 mb-4">
-                        <h2 class="mb-3 text-center">ข้อมูลของคุณ <i class="fa-regular fa-user"></i></h2>
-                        <hr>
-
-                    </div>
-                    <div class="col-md-4 "></div>
-                </div>
-
-                <!-- แถวที่สอง: ซ้ายชื่อ ขวาสาขา -->
-                <div class="row fs-5">
-                    <div class="col-md-4 ">
-                        <p><strong>ชื่อ:</strong> {{ $user->name }}</p>
-                    </div>
-                    <div class="col-md-4 ">
-                        <p><strong>รหัสนักศึกษา:</strong> {{ $user->student_id }}</p>
-                    </div>
-                    <div class="col-md-4 ">
-                        <p><strong>รหัสนักศึกษา:</strong> {{ $user->student_id }}</p>
-                    </div>
-
-                    <div class="col-md-4 ">
-                        <p><strong>ชั้นปี:</strong> {{ $user->year }}</p>
-
-                    </div>
-                    <div class="col-md-4 ">
-                        <p><strong>สาขา:</strong> {{ $user->branch }}</p>
-                    </div>
-                    <div class="col-md-4 ">
-                        <p><strong>เบอร์ติดต่อ:</strong> {{ $user->phone_number }}</p>
-                    </div>
-                </div>
-            </div>
-        @else
-            <div class="alert
-                        alert-warning">
-                ยังไม่พบสถานที่ฝึกงานของคุณในระบบ
-            </div>
-        @endif
-    </div>
-    <div class="mt-4">
-                            <h6 class="text-muted">เพื่อนที่ฝึกงานด้วยกัน</h6>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="card shadow-sm" style="width: 10rem;">
-                                    <div class="card-body text-center p-2">
-                                        <p class="card-text mb-0">เพื่อน A</p>
-                                        <small class="text-muted">IT ปี 3</small>
-                                    </div>
-                                </div>
-                                <div class="card shadow-sm" style="width: 10rem;">
-                                    <div class="card-body text-center p-2">
-                                        <p class="card-text mb-0">เพื่อน B</p>
-                                        <small class="text-muted">IT ปี 3</small>
-                                    </div>
-                                </div>
-                                <!-- เพิ่มเพื่อนเพิ่มได้ที่นี่ -->
-                            </div>
-                        </div>
-@endsection --}}
-
 @extends('layouts.app')
 
 @section('title')
@@ -93,43 +14,298 @@
             <div class="row">
                 <!-- Profile Picture -->
                 <div class="col-md-3 text-center">
-                    <img src="https://picsum.photos/id/1/200/300" class=" img-fluid mb-3" alt="User Profile">
-                    <h5 class="mt-2">ชื่อผู้ใช้</h5>
-                    <p class="text-muted">รหัสนักศึกษา: <strong>65123456</strong></p>
-                </div>
+                    @php
+                        $imagePathJpg = public_path('student_images/' . $user->student_id . '.jpg');
+                        $imagePathPng = public_path('student_images/' . $user->student_id . '.png');
+                        $imageExists = file_exists($imagePathJpg) || file_exists($imagePathPng);
+                    @endphp
 
+                    @if ($imageExists)
+                        <img src="{{ file_exists($imagePathJpg) 
+                            ? asset('student_images/' . $user->student_id . '.jpg') 
+                            : asset('student_images/' . $user->student_id . '.png') }}" 
+                            class="img-fluid mb-3 toggle-upload" alt="User Profile" style="width: 2in; height: auto; max-height: 2in; cursor: pointer;">
+                    @else
+                        <div class="text-muted toggle-upload" style="cursor: pointer;">
+                            <p class="text-center">คลิกเพื่ออัพโหลดรูปภาพ</p>
+                        </div>
+                    @endif
+
+                    <h5 class="mt-2 fw-bold">{{ $user->name }}</h5>
+                    <p class="text-muted">รหัสนักศึกษา: <strong>{{ $user->student_id }}</strong></p>
+                    <form action="{{ route('student.uploadImage') }}" method="POST" enctype="multipart/form-data" id="upload-form" style="display: none;">
+                        @csrf
+                        <div class="mb-3">
+                            <input type="file" name="profile_image" class="form-control" accept=".png, .jpg" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">อัพโหลดรูปภาพ</button>
+                    </form>
+                </div>
+                
                 <!-- Main Info -->
                 <div class="col-md-9">
-                    <h4>ข้อมูลนักศึกษา</h4>
-                    <br>
-                    <div class="row">
+                    <h4 class="fw-bold">ข้อมูลนักศึกษา</h4>
+                    <div class="row mt-3">
                         <div class="col-md-6">
-                            <p><strong>ชื่อ-นามสกุล:</strong> นาย นพรัตน์ ธนสารศิริกุล</p>
+                            <p><strong>ชื่อ-นามสกุล:</strong> {{ $user->name }}</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>รหัสนักศึกษา:</strong> 6314631017</p>
+                            <p><strong>รหัสนักศึกษา:</strong> {{ $user->student_id }}</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>ชั้นปี:</strong> 1</p>
+                            <p><strong>ชั้นปี:</strong> {{ $user->year }}</p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>สาขาวิชา:</strong> วิทคอม</p>
+                            <p><strong>สาขาวิชา:</strong> {{ $user->branch }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>เบอร์โทร:</strong> {{ $user->phone_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>อีเมล:</strong> {{ $user->email }}</p>
                         </div>
                     </div>
                     <hr>
-                    <div class="col-md-9">
-                        <h5 class="mb-3">ข้อมูลส่วนตัว</h5>
-                        <div class="row">
-                            <p><strong>เบอร์โทร:</strong> 098-123-4567</p>
-                            <p><strong>Email:</strong> student@example.com</p>
-                            <p><strong>ที่อยู่:</strong> 123/4 หมู่ 5 ต.ทดสอบ อ.เมือง จ.การฝึกงาน</p>
+                    <h5 class="fw-bold">ข้อมูลส่วนตัว</h5>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p><strong>ชื่อภาษาอังกฤษ:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->name_eng ?? '-' }}</p>
                         </div>
-                        <!-- Friends Section -->
+                        <div class="col-md-6">
+                            <p><strong>วันเกิด:</strong> 
+                                @php
+                                    $studentInfo = $student_infos->where('student_id', $user->student_id)->first();
+                                @endphp
+                                {{ isset($studentInfo) && $studentInfo->birthday 
+                                    ? \Carbon\Carbon::parse($studentInfo->birthday)->format('d/m/Y') 
+                                    : '-' }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>อายุ:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->age ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ศาสนา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->religion ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ระดับ:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->degree_level ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ภาค:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->sector ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>หมู่เรียนที่:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->group ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ภาคการศึกษา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->term_year ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ปีการศึกษา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->year ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ชื่อบิดา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->father_name ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>อาชีพของบิดา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->father_career ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ชื่อมารดา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->mother_name ?? '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>อาชีพของมารดา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->mother_career ?? '-' }}</p>
+                        </div>
+                        <div class="row">
+                            <p><strong>ที่อยู่ตามภูมิลำเนา:</strong>
+                                @if (isset($student_infos) && $user->student_id)
+                                บ้านเลขที่ {{ $student_infos->where('student_id', $user->student_id)->first()->old_house_no ?? '-' }} หมู่
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->old_moo ?? '-' }} ซอย
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->old_soi ?? '-' }}  ถนน
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->old_road ?? '-' }} ตำบล
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->old_subdistrict ?? '-' }} อำเภอ
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->old_district ?? '-' }} จังหวัด
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->old_province ?? '-' }} รหัสไปรษณีย์
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->old_zip_code ?? '-' }}
+                                @endif
+                            </p>
+                        </div>
+                        <div class="row">
+                            <p><strong>ที่อยู่ปัจจุบัน:</strong>
+                                @if (isset($student_infos) && $user->student_id)
+                                บ้านเลขที่ {{ $student_infos->where('student_id', $user->student_id)->first()->now_house_no ?? '-' }} หมู่
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->now_moo ?? '-' }} ซอย
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->now_soi ?? '-' }}  ถนน
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->now_road ?? '-' }} ตำบล
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->now_subdistrict ?? '-' }} อำเภอ
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->now_district ?? '-' }} จังหวัด
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->now_province ?? '-' }} รหัสไปรษณีย์
+                                    {{ $student_infos->where('student_id', $user->student_id)->first()->now_zip_code ?? '-' }}
+                                @endif
+                            </p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>ประสบการณ์การทำงาน:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->work_experience ?? '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>ความรู้ความสามารถพิเศษ:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->talent ?? '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>ความสนใจพิเศษ:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->special_interests ?? '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>สถานภาพ:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->marital_status ?? '-' }}</p>
+                            </div>
+                            @if (!in_array($student_infos->where('student_id', $user->student_id)->first()->marital_status ?? '', ['โสด', 'หย่าร้าง']))
+                                <div class="col-md-6">
+                                    <p><strong>ชื่อสามี/ภรรยา:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->spouse_name ?? '-' }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>อาชีพ:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->spouse_job ?? '-' }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>จำนวนบุตร:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->childern_count ?? '-' }} คน</p>
+                                </div>
+                                <div class="col-md-6">
+                                <p></p>
+                            </div>
+                            @endif
+                            <div class="col-md-6">
+                                <p></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>ชื่อบุคคลที่ติดต่อได้:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->emg_name ?? '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p></p>
+                            </div>
+                            <div class="col-md-12">
+                                <p><strong>ที่อยู่:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->emg_address ?? '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>เบอร์โทร:</strong> {{ $student_infos->where('student_id', $user->student_id)->first()->emg_phone ?? '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-end mt-3">
+                    <a href="{{-- route('student.editProfile', ['id' => $user->student_id]) --}}" class="btn btn-outline-primary">แก้ไขข้อมูลส่วนตัว</a>
+                </div>
+            </div>
+        </div>
 
+        <!-- Internship Information -->
+        <div class="col-md-12 mt-4">
+            <div class="card shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="fw-bold">ข้อมูลสถานที่ฝึกงาน</h4>
+                    <a href="{{-- route('location_infos.editProfile', ['id' => $user->student_id]) --}}" class="btn btn-outline-primary">แก้ไขข้อมูลสถานที่ฝึกงาน</a>
+                </div>
+                <div class="row mt-3">
+                    @php
+                        $locations = $locations ?? collect();
+                        $locationInfos = $location_infos ?? collect();
+
+                        // Union locations and location_infos
+                        $allLocations = $locations->map(function ($location) {
+                            return [
+                                'loc_id' => $location->loc_id,
+                                'name' => $location->name,
+                                'term_year' => $location->term_year,
+                                'loc_detail' => null,
+                                'loc_house_no' => null,
+                                'loc_moo' => null,
+                                'loc_soi' => null,
+                                'loc_road' => null,
+                                'loc_subdistrict' => null,
+                                'loc_district' => null,
+                                'loc_province' => null,
+                                'loc_zip_code' => null,
+                                'loc_phone_number' => null,
+                                'student_ids' => [
+                                    $location->student_id1,
+                                    $location->student_id2,
+                                    $location->student_id3,
+                                    $location->student_id4
+                                ]
+                            ];
+                        })->merge($locationInfos->map(function ($info) {
+                            return [
+                                'loc_id' => $info->loc_id,
+                                'name' => null,
+                                'term_year' => null,
+                                'loc_detail' => $info->loc_detail, 
+                                'loc_house_no' => $info->loc_house_no,
+                                'loc_moo' => $info->loc_moo,
+                                'loc_soi' => $info->loc_soi,
+                                'loc_road' => $info->loc_road,
+                                'loc_subdistrict' => $info->loc_subdistrict,
+                                'loc_district' => $info->loc_district,
+                                'loc_province' => $info->loc_province,
+                                'loc_zip_code' => $info->loc_zip_code,
+                                'loc_phone_number' => $info->loc_phone_number,
+                                'student_ids' => []
+                            ];
+                        }));
+
+                        $filteredLocation = $allLocations->filter(function ($location) use ($user) {
+                            return in_array($user->student_id, $location['student_ids']);
+                        })->reduce(function ($carry, $item) {
+                            return array_merge($carry, array_filter($item, fn($value) => $value !== null));
+                        }, []);
+                    @endphp
+                    <div class="col-md-12">
+                        <p><strong>สถานที่ฝึกงาน:</strong> {{ $filteredLocation['name'] ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <p><strong>ภาคการศึกษา:</strong> {{ $filteredLocation['term_year'] ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <p><strong>ข้อมูลสถานที่ฝึกงาน:</strong> {{ $filteredLocation['loc_detail'] ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <p><strong>ที่อยู่:</strong>
+                            @if ($filteredLocation)
+                                {{ $filteredLocation['loc_house_no'] ?? '-' }} หมู่
+                                {{ $filteredLocation['loc_moo'] ?? '-' }} ซอย
+                                {{ $filteredLocation['loc_soi'] ?? '-' }} ถนน
+                                {{ $filteredLocation['loc_road'] ?? '-' }} ตำบล
+                                {{ $filteredLocation['loc_subdistrict'] ?? '-' }} อำเภอ
+                                {{ $filteredLocation['loc_district'] ?? '-' }} จังหวัด
+                                {{ $filteredLocation['loc_province'] ?? '-' }} รหัสไปรษณีย์
+                                {{ $filteredLocation['loc_zip_code'] ?? '-' }}
+                            @else
+                                -
+                            @endif
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <p><strong>เบอร์โทร/แฟกซ์:</strong> {{ $filteredLocation['loc_phone_number'] ?? '-' }}</p>
                     </div>
                 </div>
             </div>
         </div>
-    @endsection
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleElements = document.querySelectorAll('.toggle-upload');
+            const uploadForm = document.getElementById('upload-form');
+
+            toggleElements.forEach(element => {
+                element.addEventListener('click', function () {
+                    uploadForm.style.display = uploadForm.style.display === 'none' ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
+@endsection

@@ -40,7 +40,30 @@
         body {
             font-family: 'Anuphan', sans-serif !important;
             /*font-family: 'Bai Jamjuree', sans-serif !important;*/
+            background-color: #f8f9fa;
+        }
 
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            border-radius: 20px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #ffffff !important; 
+            transition: color 0.3s ease, transform 0.3s ease; 
+        }
+
+        .nav-link:hover {
+            color: #ffcc00 !important;
+            transform: scale(1.1); 
+        }
+
+        .dropdown-menu {
+            border-radius: 10px;
         }
     </style>
 
@@ -52,9 +75,9 @@
 
 <body data-bs-theme="dark">
     <div id="app">
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
+                <a class="navbar-brand text-white fw-bold" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -84,55 +107,6 @@
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                                 </li>
                             @endif
-                            {{-- @else
-                            @if (Auth::user()->role == 'Administrator')
-                                <li class="nav-item">
-                                    <a class="nav-link  @yield('activeHome')"
-                                        href="{{ route('home') }}">{{ __('Home') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  @yield('activeUsers')"
-                                        href="{{ route('user.index') }}">{{ __('Users') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Auth::user()->role == 'Teacher')
-                                <li class="nav-item">
-                                    <a class="nav-link  @yield('activeSubject')" href=" ">{{ __('Subject') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  @yield('activeAttendance')" href=" ">{{ __('Attendance') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  @yield('activeReport')" href=" ">{{ __('Report') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Auth::user()->role == 'Student')
-                                <li class="nav-item">
-                                    <a class="nav-link  @yield('activeStudent')"
-                                        href=" ">{{ __('ประวัติการเช็คชื่อ') }}</a>
-                                </li>
-                            @endif
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest --}}
                         @else
                             <!-- สำหรับ Administrator -->
                             @if (Auth::user()->role == 'Administrator')
@@ -143,16 +117,17 @@
                                     <a class="nav-link  @yield('activeUsers')"
                                         href="{{ route('user.index') }}">{{ __('Users') }}</a>
                                 </li>
-                                {{-- <li class="nav-item">
-                                <a class="nav-link  @yield('activeReport')" href=" ">{{ __('Report') }}</a>
-                            </li> --}}
                             @endif
 
                             <!-- สำหรับ Teacher -->
                             @if (Auth::user()->role == 'Teacher')
                                 <li class="nav-item">
                                     <a class="nav-link  @yield('activeSubject')"
-                                        href="{{ route('location.index') }}">{{ __('สถานที่') }}</a>
+                                        href="{{ route('location.index') }}">{{ __('สถานที่ฝึกงาน') }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  @yield('activeTeacherLog')"
+                                        href="{{ route('teacher.index') }}">{{ __('ตรวจสอบบันทึกประจำวัน') }}</a>
                                 </li>
                             @endif
 
@@ -160,7 +135,11 @@
                             @if (Auth::user()->role == 'Student')
                                 <li class="nav-item">
                                     <a class="nav-link  @yield('activeStudent')"
-                                        href=" {{ route('student.index') }}">{{ __('หน้าแรก') }}</a>
+                                        href=" {{ route('student.index') }}">{{ __('ประวัติส่วนตัว') }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  @yield('activeStudent')" 
+                                        href="{{ route('student.log') }}">{{ __('ตรวจสอบบันทึกประจำวัน') }}</a>
                                 </li>
                             @endif
 
@@ -169,40 +148,52 @@
                                 <li class="nav-item">
                                     <a class="nav-link  @yield('activeStudent')" href=" ">{{ __('พี่เลี้ยง') }}</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('req') }}">{{ __('ลงทะเบียนพี่เลี้ยง') }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  @yield('activeMentorLog')"
+                                        href="{{ route('teacher.index') }}">{{ __('ตรวจสอบบันทึกประจำวัน') }}</a>
+                                </li>
                             @endif
 
-                            <!-- เมนู "เปลี่ยนบทบาท" สำหรับทุก role -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('req') }}">{{ __('ลงทะเบียนพี่เลี้ยง') }}</a>
-                            </li>
-
                             <!-- เมนู Logout -->
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault();
-                                   document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                            @auth
+                                <li class="nav-item dropdown">
+                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                        {{ Auth::user()->name }}
                                     </a>
 
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="{{ route('logout') }}"
+                                            onclick="event.preventDefault();
+                                        document.getElementById('logout-form').submit();">
+                                            {{ __('Logout') }}
+                                        </a>
+
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                            @csrf
+                                        </form>
+                                    </div>
+                                </li>
+                            @endauth
                         @endguest
+                        <li class="nav-item d-flex align-items-center">
+                            <button id="theme-toggle" class="btn btn-outline-light btn-sm ms-2">
+                                <i id="theme-icon" class="fas fa-moon"></i>
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
 
-        <main class="py-4">
-            @yield('content')
+        <main class="py-4 container">
+            <div class="card shadow-sm p-4 rounded text-center">
+                @yield('welcome')
+                @yield('content')
+            </div>
         </main>
     </div>
 
@@ -224,6 +215,30 @@
 
     <!-- Flatpickr -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const body = document.body;
+
+            // Load saved theme from localStorage or use system preference
+            const savedTheme = localStorage.getItem('theme');
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const initialTheme = savedTheme || systemTheme;
+
+            body.setAttribute('data-bs-theme', initialTheme);
+            themeIcon.className = initialTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+
+            themeToggle.addEventListener('click', function () {
+                const currentTheme = body.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                body.setAttribute('data-bs-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeIcon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            });
+        });
+    </script>
 
     @yield('scripts')
 

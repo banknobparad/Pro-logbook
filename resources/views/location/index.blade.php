@@ -1,4 +1,4 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
     @section('title')
         Subject
@@ -20,11 +20,11 @@
             <div class="row">
                 @foreach ($locations as $location)
                     <div class="col-md-6 mb-4">
-                        <div class="card border-0 shadow-lg">
+                        <div class="card border-0 shadow-lg h-100 hover-shadow">
                             <div class="card-body">
                                 <!-- ชื่อสถานที่ -->
                                 <h3 class="card-title mb-3 text-primary">
-                                    <i class="fas fa-map-marker-alt me-2"></i>{{ $location->name }}
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ $location->name }} {{ $location->term_year }}
                                 </h3>
                                 <hr>
                                 <!-- รายชื่อนักศึกษาฝึกงาน -->
@@ -122,8 +122,8 @@
                             </div>
 
                             <!-- ปุ่มดูรายละเอียด -->
-                            <div class="card-footer  text-end border-0">
-                                <a href="#" class="btn btn-outline-primary">
+                            <div class="card-footer text-end border-0 bg-light-mode">
+                                <a href="#" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-eye me-1"></i> ดูรายละเอียด
                                 </a>
                             </div>
@@ -140,7 +140,7 @@
                 <div class="modal-content">
                     <form action="{{ route('location.store') }}" method="POST">
                         @csrf
-                        <div class="modal-header">
+                        <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="addLocationModalLabel">เพิ่มสถานที่ฝึกงาน</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -173,7 +173,7 @@
                             </div>
                         </div>
 
-                        <div class="modal-footer">
+                        <div class="modal-footer bg-light-mode">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
                             <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
                         </div>
@@ -195,3 +195,34 @@
             </script>
         @endif
     @endsection
+
+    <style>
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .bg-light-mode {
+            background-color: var(--bs-light);
+        }
+
+        .bg-light-mode[data-theme="dark"] {
+            background-color: var(--bs-dark);
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const root = document.documentElement;
+            const theme = localStorage.getItem('theme') || 'light';
+            root.setAttribute('data-theme', theme);
+
+            // Update theme dynamically if toggled
+            document.querySelectorAll('[data-theme-toggle]').forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    const newTheme = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                    root.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            });
+        });
+    </script>
