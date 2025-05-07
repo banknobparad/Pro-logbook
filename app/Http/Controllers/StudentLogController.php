@@ -1,7 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\StudentLog; 
+use App\Models\StudentLog;
+use App\Models\Location; // Import the Location model
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -70,5 +71,54 @@ class StudentLogController extends Controller
         }
 
         return redirect()->back()->with('success', 'แก้ไขข้อมูลสำเร็จ');
+    }
+
+    public function show($student_id)
+    {
+        $user = auth()->user();
+
+        // Allow Teacher and Mentor roles to access without matching student_id
+        if ($user->role === 'Teacher' || $user->role === 'Mentor') {
+            $locations = Location::where(function ($query) use ($student_id) {
+                $query->where('student_id1', $student_id)
+                      ->orWhere('student_id2', $student_id)
+                      ->orWhere('student_id3', $student_id)
+                      ->orWhere('student_id4', $student_id);
+            })->first();
+
+            $student_log = StudentLog::whereIn('student_id', Location::all()->flatMap(function ($location) {
+                return [
+                    $location->student_id1,
+                    $location->student_id2,
+                    $location->student_id3,
+                    $location->student_id4,
+                ];
+            })->filter()->unique())->where('student_id', $student_id)->get();
+
+            return view('student.log', compact('locations', 'student_log'));
+        }
+
+        // Default behavior for Student role
+        if ($user->student_id != $student_id) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $locations = Location::where(function ($query) use ($student_id) {
+            $query->where('student_id1', $student_id)
+                  ->orWhere('student_id2', $student_id)
+                  ->orWhere('student_id3', $student_id)
+                  ->orWhere('student_id4', $student_id);
+        })->first();
+
+        $student_log = StudentLog::whereIn('student_id', Location::all()->flatMap(function ($location) {
+            return [
+                $location->student_id1,
+                $location->student_id2,
+                $location->student_id3,
+                $location->student_id4,
+            ];
+        })->filter()->unique())->where('student_id', $student_id)->get();
+
+        return view('student.log', compact('locations', 'student_log'));
     }
 }

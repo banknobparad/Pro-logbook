@@ -73,4 +73,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/teacher', [TeacherController::class, 'index'])->name('teacher.index');
 });
 
+Route::get('student/log/{student_id}', [StudentLogController::class, 'show'])->name('student.log.show');
+
 Route::post('/teacher/comment/update', [TeacherController::class, 'updateComment'])->name('teacher.comment.update');

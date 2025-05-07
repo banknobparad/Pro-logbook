@@ -16,14 +16,16 @@
         </thead>
         <tbody>
             @foreach($students as $student)
-            <tr>
-                <td>{{ $student->student_id }}</td>
-                <td>{{ $student->name }}</td>
-                <td>{{ $student->email }}</td>
-                <td>
-                    <a href="{{ url('student/log/' . $student->id) }}" class="btn btn-primary">ดูบันทึก</a>
-                </td>
-            </tr>
+                @if($student->student_id)
+                <tr>
+                    <td>{{ $student->student_id }}</td>
+                    <td>{{ $student->name }}</td>
+                    <td>{{ $student->email }}</td>
+                    <td>
+                        <a href="{{ url('student/log/' . $student->student_id) }}" class="btn btn-primary">ดูบันทึก</a>
+                    </td>
+                </tr>
+                @endif
             @endforeach
         </tbody>
     </table>
