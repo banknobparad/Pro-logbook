@@ -6,6 +6,7 @@ use App\Http\Controllers\MentorController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentLogController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\MentorSignatureController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
@@ -35,9 +36,17 @@ Route::put('/confirms/update', [MentorController::class, 'update'])->name('confi
 
 Route::post('/approve-mentor', [AdminController::class, 'approveMentor'])->name('approve.mentor');
 
-Route::post('/mentor/signature/update/{id}', [MentorController::class, 'updateSignature'])->name('mentor.signature.update');
+// Route for updating mentor signature
+Route::post('/mentor/signature/update/{id?}', [MentorSignatureController::class, 'update'])->name('mentor.signature.update');
+Route::post('/mentor/signature/update', [MentorSignatureController::class, 'update'])->name('mentor.signature.update');
 
 Route::post('/mentor/comment/update', [MentorController::class, 'updateComment'])->name('mentor.comment.update');
+
+// Route for updating teacher comments
+Route::post('/teacher/comment/update', [StudentLogController::class, 'updateTeacherComment'])->name('teacher.comment.update');
+
+// Route for updating mentor comments
+Route::post('/mentor/comment/update', [StudentLogController::class, 'updateMentorComment'])->name('mentor.comment.update');
 
 Route::group(['prefix' => 'location'], function () {
     Route::get('index', [LocationController::class, 'index'])->name('location.index');
@@ -74,5 +83,3 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('student/log/{student_id}', [StudentLogController::class, 'show'])->name('student.log.show');
-
-Route::post('/teacher/comment/update', [TeacherController::class, 'updateComment'])->name('teacher.comment.update');

@@ -121,4 +121,52 @@ class StudentLogController extends Controller
 
         return view('student.log', compact('locations', 'student_log'));
     }
+
+    public function updateTeacherComment(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:student_log,student_id',
+            'log_date' => 'required|date',
+            'teacher_comments' => 'required|string',
+        ]);
+
+        $studentLog = StudentLog::where('student_id', $request->student_id)->first();
+        if ($studentLog) {
+            $logs = collect($studentLog->log)->toArray(); // Convert the Collection to an array
+            $logIndex = array_search($request->log_date, array_column($logs, 'log_date'));
+
+            if ($logIndex !== false) {
+                // Replace the existing comment for the date
+                $logs[$logIndex]['t_comments'] = [$request->teacher_comments];
+                $studentLog->log = $logs; // Reassign the modified array back to the model
+                $studentLog->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'บันทึกความคิดเห็นของอาจารย์สำเร็จ');
+    }
+
+    public function updateMentorComment(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:student_log,student_id',
+            'log_date' => 'required|date',
+            'mentor_comments' => 'required|string',
+        ]);
+
+        $studentLog = StudentLog::where('student_id', $request->student_id)->first();
+        if ($studentLog) {
+            $logs = collect($studentLog->log)->toArray(); // Convert the Collection to an array
+            $logIndex = array_search($request->log_date, array_column($logs, 'log_date'));
+
+            if ($logIndex !== false) {
+                // Replace the existing comment for the date
+                $logs[$logIndex]['m_comments'] = [$request->mentor_comments];
+                $studentLog->log = $logs; // Reassign the modified array back to the model
+                $studentLog->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'บันทึกความคิดเห็นของพี่เลี้ยงสำเร็จ');
+    }
 }
