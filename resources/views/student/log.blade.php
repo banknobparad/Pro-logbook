@@ -21,6 +21,24 @@
                   ->orWhere('student_id3', $studentId)
                   ->orWhere('student_id4', $studentId);
         })->first();
+
+        $mentorNames = $locations 
+            ? collect([$locations->mentor_id1, $locations->mentor_id2, $locations->mentor_id3])
+                ->filter()
+                ->flatMap(function ($mentorId) {
+                    return \App\Models\User::where('id', $mentorId)->pluck('name');
+                })
+                ->implode(', ') 
+            : 'ไม่พบข้อมูล';
+
+        $advisorNames = $locations 
+            ? collect([$locations->teacher_id])
+                ->filter()
+                ->flatMap(function ($teacherId) {
+                    return \App\Models\User::where('id', $teacherId)->pluck('name');
+                })
+                ->implode(', ') 
+            : 'ไม่พบข้อมูล';
     @endphp
 
     @if($student)
@@ -39,11 +57,22 @@
             <div class="row mb-4">
                 <div class="col-md-6">
                     <label for="advisorName" class="form-label">ชื่ออาจารย์นิเทศก์</label>
-                    <input type="text" class="form-control" id="advisorName" name="advisor_name" value="{{ $locations->teacher_name ?? 'ไม่พบข้อมูล' }}" readonly>
+                    <input type="text" class="form-control" id="advisorName" name="advisor_name" value="{{ $advisorNames }}" readonly>
                 </div>
                 <div class="col-md-6">
                     <label for="mentorName" class="form-label">ชื่อพี่เลี้ยง</label>
-                    <input type="text" class="form-control" id="mentorName" name="mentor_name" value="{{ $locations->mentor_name ?? 'ไม่พบข้อมูล' }}" readonly>
+                    @if ($locations)
+                        <ul class="list-group">
+                            @foreach(collect([$locations->mentor_id1, $locations->mentor_id2, $locations->mentor_id3])->filter() as $mentorId)
+                                @php
+                                    $mentorName = \App\Models\User::where('id', $mentorId)->pluck('name')->first();
+                                @endphp
+                                <li class="list-group-item">{{ $mentorName ?? 'ไม่พบข้อมูล' }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <input type="text" class="form-control" value="ไม่พบข้อมูล" readonly>
+                    @endif
                 </div>
             </div>
             <div class="row mb-4">

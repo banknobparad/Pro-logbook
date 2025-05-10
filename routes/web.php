@@ -51,6 +51,8 @@ Route::post('/mentor/comment/update', [StudentLogController::class, 'updateMento
 Route::group(['prefix' => 'location'], function () {
     Route::get('index', [LocationController::class, 'index'])->name('location.index');
     Route::post('addstore', [LocationController::class, 'store'])->name('location.store');
+    Route::post('/register-advisor', [LocationController::class, 'registerAdvisor'])->name('location.registerAdvisor');
+    Route::put('/update/{id}', [LocationController::class, 'update'])->name('location.update'); // Added route for updating locations
 });
 
 Route::group(['prefix' => 'student'], function () {
